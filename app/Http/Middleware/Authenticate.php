@@ -13,9 +13,10 @@ class Authenticate extends Middleware
     protected function redirectTo(Request $request): ?string
     {
         if ($request->is('admin/*')) {
-            // 管理者専用ページに認証なしでアクセスした場合、403を返す
-            abort(403, 'Access denied');
+
+            return route('admin.login'); // 管理者用のログインページ
         }
-        return $request->expectsJson() ? null : route('login');
+        // デフォルトは一般ユーザー用のログインページ
+        return route('login');
     }
 }

@@ -31,7 +31,11 @@ class UserTest extends TestCase
 
         $response = $this->get(route('admin.users.index'));
 
-        $response->assertForbidden(); // アクセス拒否されることを確認
+        // リダイレクトされるべきなので 302 を確認
+        $response->assertStatus(302);  // リダイレクトされることを確認
+
+        // ログインページへのリダイレクトを確認
+        $response->assertRedirect(route('admin.login'));
     }
 
     /**
@@ -41,12 +45,14 @@ class UserTest extends TestCase
     {
         // 管理者ユーザーを作成してログイン
         $admin = User::factory()->create(['is_admin' => true]); // is_adminカラムで管理者フラグを確認
-        $this->actingAs($admin);
+        $this->actingAs($admin, 'admin'); // 管理者としてログイン
 
+        // 会員一覧ページへのアクセスを確認
         $response = $this->get(route('admin.users.index'));
 
-        $response->assertOk(); // アクセス成功（200 OK）
+        $response->assertOk(); // 期待されるステータスコード 200
     }
+
 
     /**
      * 未ログインのユーザーは管理者側の会員詳細ページにアクセスできない
@@ -84,7 +90,7 @@ class UserTest extends TestCase
     {
         // 管理者ユーザーを作成してログイン
         $admin = User::factory()->create(['is_admin' => true]); // is_adminカラムで管理者フラグを確認
-        $this->actingAs($admin);
+        $this->actingAs($admin, 'admin');
 
         $targetUser = User::factory()->create(); // 会員データを作成
 

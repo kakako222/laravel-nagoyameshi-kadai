@@ -12,7 +12,7 @@ require __DIR__ . '/auth.php';
 
 // 管理者用のルーティンググループ
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
-    // ホームページ
+    // 管理者ホームページ
     Route::get('home', [App\Http\Controllers\Admin\HomeController::class, 'index'])->name('home');
 
     // 会員一覧ページ
@@ -21,6 +21,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
     // 会員詳細ページ
     Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
 });
+
 
 // 管理者用認証ルート（認証が必要ないため、外に定義）
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {

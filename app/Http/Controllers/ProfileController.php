@@ -42,19 +42,24 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // パスワードのバリデーション
         $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+            'password' => ['required', 'current_password'], // 現在のパスワードを確認
+        ], [
+            'password.current_password' => 'パスワードが間違っています。',
         ]);
 
+        // ユーザーの削除処理
         $user = $request->user();
 
-        Auth::logout();
+        Auth::logout();  // ログアウト
 
-        $user->delete();
+        $user->delete();  // ユーザー削除
 
+        // セッションの無効化と再生成
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return Redirect::to('/');  // ホームへリダイレクト
     }
 }

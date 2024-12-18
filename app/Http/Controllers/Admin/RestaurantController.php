@@ -104,6 +104,14 @@ class RestaurantController extends Controller
     }
 
     /**
+     * 店舗編集ページ表示
+     */
+    public function edit(Restaurant $restaurant)
+    {
+        return view('admin.restaurants.edit', compact('restaurant'));
+    }
+
+    /**
      * 店舗更新処理
      */
     public function update(Request $request, Restaurant $restaurant)

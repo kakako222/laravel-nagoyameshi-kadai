@@ -33,6 +33,7 @@ class UserFactory extends Factory
             'postal_code' => fake()->postcode(),
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
+            'role' => 'user',
         ];
     }
 
@@ -43,6 +44,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the model's role is admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'role' => 'admin',
         ]);
     }
 }

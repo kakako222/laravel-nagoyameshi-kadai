@@ -13,7 +13,6 @@ class Authenticate extends Middleware
     protected function redirectTo(Request $request): ?string
     {
         if ($request->is('admin/*')) {
-
             return route('admin.login'); // 管理者用のログインページ
         }
         // デフォルトは一般ユーザー用のログインページ

@@ -19,6 +19,16 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        /**< テストケースに追加ここから */
+        // ファクトリでメール確認済みのユーザーを作成
+        $user = \App\Models\User::factory()->create([
+            'email_verified_at' => now(),  // メール確認済みとして扱う
+        ]);
+
+        // ユーザーが認証されていることを確認
+        $this->actingAs($user);
+        /* ここまで　新規登録の場合はemail_verifed_atがnullなので絶対に/verify-emailに遷移する */
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'kana' => 'テスト ユーザー',

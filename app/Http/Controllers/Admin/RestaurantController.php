@@ -68,9 +68,6 @@ class RestaurantController extends Controller
             'seating_capacity' => 'required|numeric|min:0',
         ]);
 
-        // バリデーション後のデータをダンプして確認
-        dd($validated);
-
         // 店舗データの作成
         $restaurant = new Restaurant();
         $restaurant->name = $validated['name'];
@@ -84,25 +81,17 @@ class RestaurantController extends Controller
         $restaurant->seating_capacity = $validated['seating_capacity'];
 
         // 画像アップロード処理
-        //if ($request->hasFile('image')) {
-        //  $imagePath = $request->file('image')->store('public/restaurants');
-        //$restaurant->image = basename($imagePath);
-        // }
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('public/restaurants');
+            $restaurant->image = basename($imagePath);  // 画像パスを保存
+        }
 
-        // データを保存
+        // 店舗情報をデータベースに保存
         $restaurant->save();
 
-        return redirect()
-            ->route('admin.restaurants.index')  // 'restaurant' 変数をビューに渡す
-            ->with('flash_message', '店舗を登録しました。');
-    }
-
-    /**
-     * 店舗編集ページ表示
-     */
-    public function edit(Restaurant $restaurant)
-    {
-        return view('admin.restaurants.edit', compact('restaurant'));
+        // フラッシュメッセージとリダイレクト
+        return redirect()->route('admin.restaurants.index')
+            ->with('flash_message', '店舗を登録しました！');
     }
 
     /**

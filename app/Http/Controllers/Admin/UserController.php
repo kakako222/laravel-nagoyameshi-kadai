@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 
 class UserController extends Controller
@@ -35,5 +36,25 @@ class UserController extends Controller
     {
         // 会員詳細ページに渡す変数
         return view('admin.users.show', compact('user'));
+    }
+    // ユーザー登録処理
+    public function store(Request $request)
+    {
+        // バリデーション
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // 新しいユーザーを作成
+        $user = new User();
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        // パスワードをBcryptでハッシュ化して保存
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('success', 'ユーザーが登録されました');
     }
 }

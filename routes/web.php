@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\RestaurantController;
+use App\Http\Controllers\Admin\CategoryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,6 +33,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
 
     // 店舗関連のルート(edit)
     Route::resource('restaurants', RestaurantController::class);
+
+    //カテゴリ管理
+    Route::resource('categories', CategoryController::class)->except(['show']);
 });
 
 // ユーザー用のルート（認証済みユーザー）

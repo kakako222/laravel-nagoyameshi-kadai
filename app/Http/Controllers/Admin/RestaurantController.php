@@ -113,10 +113,10 @@ class RestaurantController extends Controller
             'seating_capacity' => 'required|integer|min:0',
         ]);
 
-        // 画像アップロード処理
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/restaurants');
-            $validated['image'] = basename($imagePath);
+        　　// 画像アップロード処理
+            if ($request->hasFile('image')) {
+               $imagePath = $request->file('image')->store('public/restaurants');
+               $validated['image'] = basename($imagePath);
 
             // 古い画像の削除
             if ($restaurant->image && Storage::exists('public/restaurants/' . $restaurant->image)) {

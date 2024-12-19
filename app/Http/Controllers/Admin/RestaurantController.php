@@ -85,33 +85,13 @@ class RestaurantController extends Controller
             $imagePath = $request->file('image')->store('public/restaurants');
             $validated['image'] = basename($imagePath);
 
-            // 古い画像の削除
-            if ($restaurant->image && Storage::exists('public/restaurants/' . $restaurant->image)) {
-                Storage::delete('public/restaurants/' . $restaurant->image);
-            }
-        } else {
-            // 画像がない場合は、元の画像名を保持
-            $validated['image'] = $restaurant->image;
+            // データを更新
+            $restaurant->save();
+
+            // フラッシュメッセージ
+            return redirect()->route('admin.restaurants.index')
+                ->with('flash_message', '店舗を登録しました！');
         }
-
-        // データを更新
-        $restaurant->update($validated);
-
-        // フラッシュメッセージ
-        return redirect()->route('admin.restaurants.index')
-            ->with('flash_message', '店舗を登録しました！');
-        // フラッシュメッセージとリダイレクト
-        return redirect()
-            ->route('admin.restaurants.show', $restaurant)
-            ->with('flash_message', '店舗を編集しました。');
-    }
-
-    /**
-     * 店舗編集ページ表示
-     */
-    public function edit(Restaurant $restaurant)
-    {
-        return view('admin.restaurants.edit', compact('restaurant'));
     }
 
     /**

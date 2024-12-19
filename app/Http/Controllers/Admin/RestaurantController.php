@@ -46,7 +46,11 @@ class RestaurantController extends Controller
      */
     public function create()
     {
-        return view('admin.restaurants.create');
+        // categoriesテーブルから全カテゴリを取得
+        $categories = Category::all();
+
+        // 店舗登録ページビューにカテゴリ情報を渡す
+        return view('admin.restaurants.create', compact('categories'));
     }
 
     /**
@@ -66,6 +70,8 @@ class RestaurantController extends Controller
             'opening_time' => 'required|before:closing_time',
             'closing_time' => 'required|after:opening_time',
             'seating_capacity' => 'required|numeric|min:0',
+            'category_ids' => 'nullable|array', // カテゴリIDの配列
+            'category_ids.*' => 'exists:categories,id',
         ]);
 
         // 店舗データの作成
@@ -88,15 +94,15 @@ class RestaurantController extends Controller
 
         // 店舗情報をデータベースに保存
         $restaurant->save();
+        // カテゴリの関連付け（多対多）
+        $category_ids = $validated['category_ids'] ?? [];
+        $restaurant->categories()->sync($category_ids);  // カテゴリの関連付け
 
         // フラッシュメッセージとリダイレクト
         return redirect()->route('admin.restaurants.index')
             ->with('flash_message', '店舗を登録しました！');
     }
 
-    /**
-     * 店舗更新処理
-     */
     public function update(Request $request, Restaurant $restaurant)
     {
         // バリデーションルール
@@ -111,6 +117,8 @@ class RestaurantController extends Controller
             'opening_time' => 'required|date_format:H:i|before:closing_time',
             'closing_time' => 'required|date_format:H:i|after:opening_time',
             'seating_capacity' => 'required|integer|min:0',
+            'category_ids' => 'nullable|array',  // カテゴリIDの配列（オプション）
+            'category_ids.*' => 'exists:categories,id',
         ]);
 
         // 画像アップロード処理
@@ -127,11 +135,20 @@ class RestaurantController extends Controller
         // データを更新
         $restaurant->update($validated);
 
+        // 既存のカテゴリ関連を削除
+        $restaurant->categories()->detach();
+
+        // 新しいカテゴリIDの関連を追加
+        if ($request->has('category_ids') && is_array($request->category_ids)) {
+            $restaurant->categories()->attach($request->category_ids);
+        }
+
         // フラッシュメッセージとリダイレクト
         return redirect()
             ->route('admin.restaurants.show', $restaurant)
             ->with('flash_message', '店舗を編集しました。');
     }
+
 
     /**
      * 店舗削除処理
@@ -149,5 +166,22 @@ class RestaurantController extends Controller
         // フラッシュメッセージを設定してリダイレクト
         return redirect()->route('admin.restaurants.index')
             ->with('flash_message', '店舗を削除しました。');
+    }
+    /**
+     * 店舗編集ページ
+     */
+    public function edit($id)
+    {
+        // 編集対象の店舗を取得
+        $restaurant = Restaurant::findOrFail($id);
+
+        // 店舗に関連するカテゴリのIDの配列を取得
+        $category_ids = $restaurant->categories->pluck('id')->toArray();
+
+        // 全てのカテゴリを取得
+        $categories = Category::all();
+
+        // ビューにデータを渡す
+        return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids'));
     }
 }

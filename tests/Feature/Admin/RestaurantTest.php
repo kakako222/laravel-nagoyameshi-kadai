@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Admin; // 管理者モデルをインポート
 use App\Models\Restaurant; // 店舗モデルをインポート
+use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -136,5 +137,115 @@ class RestaurantTest extends TestCase
 
         // データベースから削除されたことを確認
         $this->assertDatabaseMissing('restaurants', ['id' => $restaurant->id]);
+    }
+    /** @test */
+    public function test_ログイン済みの管理者は店舗にカテゴリを設定できる()
+    {
+        // カテゴリのダミーデータを3つ作成
+        $categories = Category::factory(3)->create();
+
+        // 作成したカテゴリのIDを配列として取得
+        $categoryIds = $categories->pluck('id')->toArray();
+
+        // 店舗データの作成
+        $restaurant_data = Restaurant::factory()->make()->toArray();
+
+        // `category_ids` を追加
+        $restaurant_data['category_ids'] = $categoryIds;
+
+        // 管理者としてログインして店舗を登録
+        $response = $this->actingAs($this->admin, 'admin')->post(route('admin.restaurants.store'), $restaurant_data);
+
+        // リダイレクトされることを確認
+        $response->assertRedirect(route('admin.restaurants.index'));
+
+        // データベースにレストランが追加されたことを確認
+        $this->assertDatabaseHas('restaurants', ['name' => $restaurant_data['name']]);
+
+        // category_restaurantテーブルにデータがあることを確認
+        foreach ($categoryIds as $categoryId) {
+            $this->assertDatabaseHas('category_restaurant', [
+                'restaurant_id' => Restaurant::where('name', $restaurant_data['name'])->first()->id,
+                'category_id' => $categoryId,
+            ]);
+        }
+    }
+
+    /** @test */
+    public function test_ログイン済みの管理者は店舗を更新しカテゴリも設定できる()
+    {
+        // 既存の店舗とカテゴリを作成
+        $restaurant = Restaurant::factory()->create([
+            'description' => 'テスト用の説明',
+            'lowest_price' => 1000,
+            'highest_price' => 5000,
+            'postal_code' => '1234567',
+            'address' => '名古屋市テスト区',
+            'opening_time' => '10:00',
+            'closing_time' => '22:00',
+            'seating_capacity' => 50,
+        ]);
+
+        $categories = Category::factory(3)->create();
+        $categoryIds = $categories->pluck('id')->toArray();
+        // 店舗にカテゴリを設定
+        $restaurant->categories()->attach($categoryIds);
+
+        // 更新データの準備
+        $new_restaurant_data = [
+            'name' => '更新されたレストラン名',
+            'description' => '新しい説明', // 必須フィールド
+            'lowest_price' => 1500,        // 必須フィールド
+            'highest_price' => 6000,       // 必須フィールド
+            'postal_code' => '9876543',   // 必須フィールド
+            'address' => '名古屋市新しい区', // 必須フィールド
+            'opening_time' => '09:00',     // 必須フィールド
+            'closing_time' => '23:00',     // 必須フィールド
+            'seating_capacity' => 60,      // 必須フィールド
+            'category_ids' => $categoryIds,
+        ];
+
+        // 管理者としてログインして店舗を更新
+        $response = $this->actingAs($this->admin, 'admin')->put(route('admin.restaurants.update', $restaurant), $new_restaurant_data);
+
+        // リダイレクトされることを確認
+        $response->assertRedirect(route('admin.restaurants.show', $restaurant));
+
+        // 店舗名が更新されたことを確認
+        $this->assertDatabaseHas('restaurants', ['name' => '更新されたレストラン名']);
+
+        // category_restaurantテーブルにデータが存在することを確認
+        foreach ($categoryIds as $categoryId) {
+            $this->assertDatabaseHas('category_restaurant', [
+                'restaurant_id' => $restaurant->id,
+                'category_id' => $categoryId,
+            ]);
+        }
+    }
+
+    /** @test */
+    public function test_ログイン済みの一般ユーザーは店舗にカテゴリを設定できない()
+    {
+        // 一般ユーザーとしてログイン
+        $user = User::factory()->create();
+
+        // カテゴリのダミーデータを3つ作成
+        $categories = Category::factory(3)->create();
+
+        // 作成したカテゴリのIDを配列として取得
+        $categoryIds = $categories->pluck('id')->toArray();
+
+        // 店舗データの作成
+        $restaurant_data = Restaurant::factory()->make()->toArray();
+        $restaurant_data['category_ids'] = $categoryIds;
+
+        // category_idsを削除
+        unset($restaurant_data['category_ids']);
+
+        // 一般ユーザーとしてログインして店舗登録リクエストを送信
+        $response = $this->actingAs($user)->post(route('admin.restaurants.store'), $restaurant_data);
+
+        // ログインページにリダイレクトされることを確認
+        $response->assertRedirect(route('admin.login')); // 一般ユーザーは店舗登録できない
     }
 }

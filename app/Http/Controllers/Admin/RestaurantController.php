@@ -80,21 +80,16 @@ class RestaurantController extends Controller
         $restaurant->closing_time = $validated['closing_time'];
         $restaurant->seating_capacity = $validated['seating_capacity'];
 
-        // 画像のアップロード
+        // 画像アップロード処理
         if ($request->hasFile('image')) {
-            // 画像を指定の場所に保存
             $imagePath = $request->file('image')->store('public/restaurants');
-            // 画像ファイル名を取得して保存
-            $restaurant->image = basename($imagePath);
-        } else {
-            // 画像がない場合はnullを設定
-            $restaurant->image = null;
+            $restaurant->image = basename($imagePath);  // 画像パスを保存
         }
 
-        // データの保存
+        // 店舗情報をデータベースに保存
         $restaurant->save();
 
-        // フラッシュメッセージ
+        // フラッシュメッセージとリダイレクト
         return redirect()->route('admin.restaurants.index')
             ->with('flash_message', '店舗を登録しました！');
     }

@@ -96,7 +96,7 @@ class RestaurantController extends Controller
 
         // フラッシュメッセージ
         return redirect()->route('admin.restaurants.index')
-            ->with('flash_message', '店舗を登録しました。');
+            ->with('flash_message', '店舗を登録しました！');
     }
 
     /**

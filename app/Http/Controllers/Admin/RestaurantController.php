@@ -89,9 +89,8 @@ class RestaurantController extends Controller
         // データを保存
         $restaurant->save();
 
-        // フラッシュメッセージとリダイレクト
         return redirect()
-            ->route('admin.restaurants.index') // 適切なリダイレクト先を指定
+            ->route('admin.restaurants.index', compact('restaurant'))  // 'restaurant' 変数をビューに渡す
             ->with('flash_message', '店舗を登録しました。');
     }
 

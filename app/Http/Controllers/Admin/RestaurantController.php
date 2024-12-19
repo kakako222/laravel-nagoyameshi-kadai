@@ -97,6 +97,9 @@ class RestaurantController extends Controller
         // データを更新
         $restaurant->update($validated);
 
+        // フラッシュメッセージ
+        return redirect()->route('admin.restaurants.index')
+            ->with('flash_message', '店舗を登録しました！');
         // フラッシュメッセージとリダイレクト
         return redirect()
             ->route('admin.restaurants.show', $restaurant)

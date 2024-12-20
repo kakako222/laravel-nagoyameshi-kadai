@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,7 +28,7 @@ class RestaurantController extends Controller
 
         // ページネーション
         $restaurants = $restaurantsQuery->paginate(10);
-        $total = Restaurant::count(); // レストランの総件数
+        $total = $restaurantsQuery->count(); // 検索結果の総数を取得
 
         // ビューにデータを渡す
         return view('admin.restaurants.index', compact('restaurants', 'keyword', 'total'));
@@ -89,11 +90,13 @@ class RestaurantController extends Controller
         // 画像アップロード処理
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('public/restaurants');
+            \Log::info('Image Path: ' . $imagePath); // デバッグ用ログ
             $restaurant->image = basename($imagePath);  // 画像パスを保存
         }
 
         // 店舗情報をデータベースに保存
         $restaurant->save();
+
         // カテゴリの関連付け（多対多）
         $category_ids = $validated['category_ids'] ?? [];
         $restaurant->categories()->sync($category_ids);  // カテゴリの関連付け
@@ -156,9 +159,11 @@ class RestaurantController extends Controller
     public function destroy(Restaurant $restaurant)
     {
         // 画像ファイルが存在する場合、削除（任意）
-        if ($restaurant->image && Storage::exists('public/restaurants/' . $restaurant->image)) {
-            Storage::delete('public/restaurants/' . $restaurant->image);
+        $imagePath = 'public/restaurants/' . $restaurant->image;
+        if ($restaurant->image && Storage::exists($imagePath)) {
+            Storage::delete($imagePath);
         }
+
 
         // 店舗データの削除
         $restaurant->delete();

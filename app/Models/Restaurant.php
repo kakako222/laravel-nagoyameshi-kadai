@@ -43,6 +43,6 @@ class Restaurant extends Model
     public function regular_holidays()
     {
         return $this->belongsToMany(RegularHoliday::class, 'regular_holiday_restaurant', 'restaurant_id', 'regular_holiday_id')
-            ->select('regular_holidays.id as holiday_id', 'regular_holidays.name'); // カラムにエイリアスをつける
+            ->select('regular_holidays.id as holiday_id', 'regular_holidays.day'); // カラムにエイリアスをつける
     }
 }

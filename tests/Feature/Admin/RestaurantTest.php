@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Admin; // 管理者モデルをインポート
 use App\Models\Restaurant; // 店舗モデルをインポート
 use App\Models\Category;
+use App\Models\RegularHoliday;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -247,5 +248,82 @@ class RestaurantTest extends TestCase
 
         // ログインページにリダイレクトされることを確認
         $response->assertRedirect(route('admin.login')); // 一般ユーザーは店舗登録できない
+    }
+    /** @test */
+    public function test_ログイン済みの管理者は店舗の定休日を更新できる()
+    {
+        // 事前準備：レストランと定休日を作成
+        $restaurant = Restaurant::factory()->create([
+            'name' => 'レストラン名',
+            'description' => 'レストランの説明',
+            'lowest_price' => 1000,
+            'highest_price' => 5000,
+            'postal_code' => '123-4567',
+            'address' => '東京都渋谷区',
+            'opening_time' => '10:00',
+            'closing_time' => '22:00',
+            'seating_capacity' => 50
+        ]);
+        $regularHoliday = RegularHoliday::factory()->create(); // 定休日の作成
+
+        // 定休日をレストランに関連付け
+        $restaurant->regular_holidays()->attach($regularHoliday->id);
+
+        // 更新するデータ
+        $newData = [
+            'regular_holiday_ids' => [$regularHoliday->id] // 更新する定休日ID
+        ];
+
+        // 管理者としてリクエストを送信
+        $response = $this->actingAs($this->admin, 'admin')
+            ->put(route('admin.restaurants.update', $restaurant), $newData);
+
+        // レスポンスを確認
+        $response->assertStatus(302); // リダイレクトが期待される場合
+
+        // 定休日が正しく関連付けられていることを確認
+        $this->assertDatabaseHas('regular_holiday_restaurant', [
+            'restaurant_id' => $restaurant->id,
+            'regular_holiday_id' => $regularHoliday->id,
+        ]);
+
+        // 更新データの準備（必須フィールドを追加）
+        $newRestaurantData = [
+            'name' => '更新されたレストラン名',
+            'description' => '新しい説明',
+            'lowest_price' => 1500,
+            'highest_price' => 6000,
+            'postal_code' => '9876543',
+            'address' => '新しい住所',
+            'opening_time' => '09:00',
+            'closing_time' => '23:00',
+            'seating_capacity' => 60,
+            'regular_holiday_ids' => [$regularHoliday->id], // 定休日の更新
+        ];
+
+        // 管理者としてログインして店舗を更新
+        $response = $this->actingAs($this->admin, 'admin')->put(route('admin.restaurants.update', $restaurant), $newRestaurantData);
+
+        // リダイレクトを確認
+        $response->assertRedirect(route('admin.restaurants.show', $restaurant));
+
+        // データベースに変更が保存されたことを確認
+        $this->assertDatabaseHas('restaurants', ['name' => '更新されたレストラン名']);
+        $this->assertDatabaseHas('restaurants', ['description' => '新しい説明']);
+        $this->assertDatabaseHas('restaurants', ['lowest_price' => 1500]);
+        $this->assertDatabaseHas('restaurants', ['highest_price' => 6000]);
+        $this->assertDatabaseHas('restaurants', ['postal_code' => '9876543']);
+        $this->assertDatabaseHas('restaurants', ['address' => '新しい住所']);
+        $this->assertDatabaseHas('restaurants', ['opening_time' => '09:00']);
+        $this->assertDatabaseHas('restaurants', ['closing_time' => '23:00']);
+        $this->assertDatabaseHas('restaurants', ['seating_capacity' => 60]);
+
+        // 定休日が更新されたことを確認
+        foreach ($newRestaurantData['regular_holiday_ids'] as $holidayId) {
+            $this->assertDatabaseHas('regular_holiday_restaurant', [
+                'restaurant_id' => $restaurant->id,
+                'regular_holiday_id' => $holidayId,
+            ]);
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Models\Category;
+use App\Models\RegularHoliday;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -50,9 +51,13 @@ class RestaurantController extends Controller
         // categoriesテーブルから全カテゴリを取得
         $categories = Category::all();
 
-        // 店舗登録ページビューにカテゴリ情報を渡す
-        return view('admin.restaurants.create', compact('categories'));
+        // 定休日のデータを取得
+        $regular_holidays = RegularHoliday::all();
+
+        // 店舗登録ページを表示
+        return view('admin.restaurants.create', compact('categories', 'regular_holidays'));
     }
+
 
     /**
      * 店舗登録処理
@@ -73,6 +78,8 @@ class RestaurantController extends Controller
             'seating_capacity' => 'required|numeric|min:0',
             'category_ids' => 'nullable|array', // カテゴリIDの配列
             'category_ids.*' => 'exists:categories,id',
+            'regular_holiday_ids' => 'array',  // 定休日のIDは配列として受け取る
+            'regular_holiday_ids.*' => 'exists:regular_holidays,id', // 定休日IDが正しいか確認
         ]);
 
         // 店舗データの作成
@@ -101,6 +108,11 @@ class RestaurantController extends Controller
         $category_ids = $validated['category_ids'] ?? [];
         $restaurant->categories()->sync($category_ids);  // カテゴリの関連付け
 
+        // 定休日のID配列を同期
+        if (isset($validated['regular_holiday_ids'])) {
+            $restaurant->regular_holidays()->sync($validated['regular_holiday_ids']);
+        }
+
         // フラッシュメッセージとリダイレクト
         return redirect()->route('admin.restaurants.index')
             ->with('flash_message', '店舗を登録しました！');
@@ -122,6 +134,8 @@ class RestaurantController extends Controller
             'seating_capacity' => 'required|integer|min:0',
             'category_ids' => 'nullable|array',  // カテゴリIDの配列（オプション）
             'category_ids.*' => 'exists:categories,id',
+            'regular_holiday_ids' => 'nullable|array',
+            'regular_holiday_ids.*' => 'exists:regular_holidays,id',
         ]);
 
         // 画像アップロード処理
@@ -135,22 +149,24 @@ class RestaurantController extends Controller
             }
         }
 
-        // データを更新
+        // 店舗データの更新
         $restaurant->update($validated);
 
-        // 既存のカテゴリ関連を削除
-        $restaurant->categories()->detach();
+        // カテゴリの関連付けを同期
+        if (isset($validated['category_ids'])) {
+            $restaurant->categories()->sync($validated['category_ids']);
+        }
 
-        // 新しいカテゴリIDの関連を追加
-        if ($request->has('category_ids') && is_array($request->category_ids)) {
-            $restaurant->categories()->attach($request->category_ids);
+        // 定休日の同期
+        if (isset($validated['regular_holiday_ids'])) {
+            $restaurant->regular_holidays()->sync($validated['regular_holiday_ids']);
         }
 
         // フラッシュメッセージとリダイレクト
-        return redirect()
-            ->route('admin.restaurants.show', $restaurant)
+        return redirect()->route('admin.restaurants.show', $restaurant)
             ->with('flash_message', '店舗を編集しました。');
     }
+
 
 
     /**
@@ -186,7 +202,13 @@ class RestaurantController extends Controller
         // 全てのカテゴリを取得
         $categories = Category::all();
 
+        // 定休日のデータを取得
+        $regular_holidays = RegularHoliday::all();
+
+        // 店舗が選択している定休日のIDを取得
+        $selected_regular_holidays = $restaurant->regular_holidays()->pluck('id')->toArray();
+
         // ビューにデータを渡す
-        return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids'));
+        return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids', 'regular_holidays', 'selected_regular_holidays'));
     }
 }

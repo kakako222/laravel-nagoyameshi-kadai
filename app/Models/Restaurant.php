@@ -33,8 +33,16 @@ class Restaurant extends Model
     //定休日
     // App\Models\Restaurant.php
 
+    /*
     public function regular_holidays()
     {
         return $this->belongsToMany(RegularHoliday::class, 'regular_holiday_restaurant', 'restaurant_id', 'regular_holiday_id');
+    }
+        */
+
+    public function regular_holidays()
+    {
+        return $this->belongsToMany(RegularHoliday::class, 'regular_holiday_restaurant', 'restaurant_id', 'regular_holiday_id')
+            ->select('regular_holidays.id as holiday_id', 'regular_holidays.name'); // カラムにエイリアスをつける
     }
 }

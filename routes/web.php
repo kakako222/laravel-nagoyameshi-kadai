@@ -10,12 +10,17 @@ use App\Http\Controllers\Admin\TermController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\ProfileController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//Route::get('/', function () {
+// return view('welcome');
+//});
 
 // トップページのルート
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// 既存のルートはそのまま
+Route::get('/profile', function () {
+    return view('profile');
+})->name('profile');
 
 require __DIR__ . '/auth.php';
 

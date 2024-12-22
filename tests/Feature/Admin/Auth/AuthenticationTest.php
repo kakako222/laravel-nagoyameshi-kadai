@@ -23,6 +23,7 @@ class AuthenticationTest extends TestCase
 
     public function test_admins_can_authenticate_using_the_login_screen(): void
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         $admin = new Admin();
         $admin->email = 'admin@example.com';
         $admin->password = Hash::make('nagoyameshi');
@@ -54,6 +55,7 @@ class AuthenticationTest extends TestCase
 
     public function test_admins_can_logout(): void
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         $admin = new Admin();
         $admin->email = 'admin@example.com';
         $admin->password = Hash::make('nagoyameshi');

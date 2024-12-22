@@ -18,6 +18,7 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // 新規ユーザーの登録
         $response = $this->post('/register', [
             'name' => 'Test User',

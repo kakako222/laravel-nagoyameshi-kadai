@@ -19,6 +19,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- <env name="APP_ENV" value="server"/> -->
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="DB_DATABASE" value="laravel_nagoyameshi_test"/>
         <env name="CACHE_DRIVER" value="array"/>

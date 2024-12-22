@@ -85,6 +85,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_未ログインのユーザーは店舗を登録できない()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         $data = Restaurant::factory()->make()->toArray();
 
         $response = $this->post(route('admin.restaurants.store'), $data);
@@ -94,6 +95,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_ログイン済みの一般ユーザーは店舗を登録できない()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         $data = Restaurant::factory()->make()->toArray();
 
         // 一般ユーザーでアクセスし、ログインページへのリダイレクトを確認
@@ -107,6 +109,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_ログイン済みの管理者は店舗を登録できる()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // 管理者ユーザーを作成
         $admin = User::factory()->create([
             'role' => 'admin',  // adminロールを付与
@@ -126,6 +129,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_ログイン済みの管理者は店舗を削除できる()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // $restaurant を生成する部分
         $restaurant = \App\Models\Restaurant::factory()->create();
 
@@ -142,6 +146,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_ログイン済みの管理者は店舗にカテゴリを設定できる()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // カテゴリのダミーデータを3つ作成
         $categories = Category::factory(3)->create();
 
@@ -175,6 +180,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_ログイン済みの管理者は店舗を更新しカテゴリも設定できる()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // 既存の店舗とカテゴリを作成
         $restaurant = Restaurant::factory()->create([
             'description' => 'テスト用の説明',
@@ -227,6 +233,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_ログイン済みの一般ユーザーは店舗にカテゴリを設定できない()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // 一般ユーザーとしてログイン
         $user = User::factory()->create();
 
@@ -252,6 +259,7 @@ class RestaurantTest extends TestCase
     /** @test */
     public function test_ログイン済みの管理者は店舗の定休日を更新できる()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
         // 事前準備：レストランと定休日を作成
         $restaurant = Restaurant::factory()->create([
             'name' => 'レストラン名',

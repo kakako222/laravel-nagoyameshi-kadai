@@ -68,10 +68,14 @@ class CategoryController extends Controller
     {
         // バリデーションの実行
         $request->validate([
-            'name' => 'required|string|max:255',
-        ], [
-            'name.required' => 'カテゴリ名は必須です。',
-            'name.max' => 'カテゴリ名は255文字以内で入力してください。',
+            'name' => 'required|max:255',
+            'postal_code' => 'required|numeric',
+            'address' => 'required',
+            'representative' => 'required',
+            'establishment_date' => 'required|date',
+            'capital' => 'required|numeric',
+            'business' => 'required',
+            'number_of_employees' => 'required|numeric',
         ]);
 
         // カテゴリの更新

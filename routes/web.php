@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\TermController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,8 +37,18 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
     // 店舗関連のルート(edit)
     Route::resource('restaurants', RestaurantController::class);
 
-    //カテゴリ管理
+    // カテゴリ管理
     Route::resource('categories', CategoryController::class)->except(['show']);
+
+    // 会社概要関連
+    Route::get('company', [CompanyController::class, 'index'])->name('company.index');
+    Route::get('company/{company}/edit', [CompanyController::class, 'edit'])->name('company.edit');
+    Route::put('company/{company}', [CompanyController::class, 'update'])->name('company.update');
+
+    // 利用規約関連
+    Route::get('terms', [TermController::class, 'index'])->name('terms.index');
+    Route::get('terms/{term}/edit', [TermController::class, 'edit'])->name('terms.edit');
+    Route::put('terms/{term}', [TermController::class, 'update'])->name('terms.update');
 });
 
 // ユーザー用のルート（認証済みユーザー）
@@ -43,4 +56,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', function () {
         return view('profile');  // 'profile' ビューを表示
     })->name('profile');
+
+    // プロフィール編集フォーム
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    // プロフィール情報の更新
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // アカウント削除
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });

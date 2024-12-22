@@ -26,9 +26,11 @@ class CompanyController extends Controller
         dd(auth('admin')->user());
 
         /* 管理者以外は403 */
+        /*
         if (Auth::user() && !Auth::user()->is_admin) {
             abort(403, 'アクセスが拒否されました。');
         }
+            */
         return view('admin.company.edit', compact('company'));
     }
 

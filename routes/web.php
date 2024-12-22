@@ -14,6 +14,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// トップページのルート
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 require __DIR__ . '/auth.php';
 
 // 管理者用認証ルート（認証が必要ないため、外に定義）
@@ -27,7 +30,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 // 一般ユーザー用のルート（ログインした一般ユーザーがアクセス可能）
 Route::middleware(['auth'])->group(function () {
     // トップページ（一般ユーザー用）
-    Route::get('/home', [HomeController::class, 'index']);
+    //Route::get('/home', [HomeController::class, 'index']);
 
     Route::get('/profile', function () {
         return view('profile');  // 'profile' ビューを表示
@@ -44,10 +47,12 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ゲスト（管理者としてログインしていない状態）用のルートグループ
+/*
 Route::group(['middleware' => 'guest'], function () {
     // トップページ（一般ユーザー用）
     Route::get('/', [HomeController::class, 'index'])->name('home');
 });
+*/
 
 // 管理者用のルーティンググループ（認証が必要）
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {

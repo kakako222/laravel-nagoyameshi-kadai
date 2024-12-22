@@ -22,6 +22,9 @@ class CompanyController extends Controller
 
     public function edit(Company $company)
     {
+        // 管理者として認証されているかを確認する
+        dd(auth('admin')->user());
+
         /* 管理者以外は403 */
         if (Auth::user() && !Auth::user()->is_admin) {
             abort(403, 'アクセスが拒否されました。');

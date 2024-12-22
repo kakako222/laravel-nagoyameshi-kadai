@@ -13,11 +13,10 @@ class HomeController extends Controller
     // トップページの表示
     public function index()
     {
-        //管理者がアクセスしていた場合は403を返す
-        //if (auth()->guard('admin')->check()) {
-
-        //abort(403, 'Access denied');
-        //}
+        // 管理者がアクセスしていた場合は、管理者用ページにリダイレクト
+        if (auth()->guard('admin')->check()) {
+            return redirect()->route('admin.home'); // 管理者用トップページ
+        }
 
         // 評価が高いレストラン（現時点では並べ替えず、take()メソッドで6件取得）
         $highly_rated_restaurants = Restaurant::take(6)->get();
@@ -30,8 +29,5 @@ class HomeController extends Controller
 
         // ビューにデータを渡して表示
         return view('home', compact('highly_rated_restaurants', 'categories', 'new_restaurants'));
-
-        //一般ユーザのトップページ
-        //return view('home');
     }
 }

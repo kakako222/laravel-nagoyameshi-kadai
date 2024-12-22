@@ -14,10 +14,10 @@ class HomeController extends Controller
     public function index()
     {
         //管理者がアクセスしていた場合は403を返す
-        if (auth()->guard('admin')->check()) {
-            dd('管理者がアクセスしている');
-            abort(403, 'Access denied');
-        }
+        //if (auth()->guard('admin')->check()) {
+
+        //abort(403, 'Access denied');
+        //}
 
         // 評価が高いレストラン（現時点では並べ替えず、take()メソッドで6件取得）
         $highly_rated_restaurants = Restaurant::take(6)->get();

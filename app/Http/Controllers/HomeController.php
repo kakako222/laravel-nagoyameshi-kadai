@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Restaurant;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Http\ReviewController;
 use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller

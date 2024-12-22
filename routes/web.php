@@ -75,5 +75,5 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
     // 利用規約関連
     Route::get('terms', [TermController::class, 'index'])->name('terms.index');
     Route::get('terms/{term}/edit', [TermController::class, 'edit'])->name('terms.edit');
-    Route::put('terms/{term}', [TermController::class, 'update'])->name('terms.update');
+    Route::patch('terms/{term}', [TermController::class, 'update'])->name('terms.update');
 });

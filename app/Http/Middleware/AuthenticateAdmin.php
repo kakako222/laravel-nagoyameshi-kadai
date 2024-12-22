@@ -16,6 +16,14 @@ class AuthenticateAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        dd($request->url()); // リクエストURLを確認
+        // 管理者が一般ユーザーのページにアクセスしようとする場合
+        if ($request->is('home')) {
+            // 403 Forbiddenを返す
+            dd("hoge");
+            abort(403);
+        }
+
         // 管理者として認証されていない場合、ログインページにリダイレクト
         if (!Auth::guard('admin')->check()) {
             return redirect()->route('admin.login');

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\TermController;
+use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
@@ -23,7 +24,32 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-// 管理者用のルーティンググループ(認証が必要)
+// 一般ユーザー用のルート（ログインした一般ユーザーがアクセス可能）
+Route::middleware(['auth'])->group(function () {
+    // トップページ（一般ユーザー用）
+    Route::get('/home', [HomeController::class, 'index']);
+
+    Route::get('/profile', function () {
+        return view('profile');  // 'profile' ビューを表示
+    })->name('profile');
+
+    // プロフィール編集フォーム
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    // プロフィール情報の更新
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // アカウント削除
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// ゲスト（管理者としてログインしていない状態）用のルートグループ
+Route::group(['middleware' => 'guest'], function () {
+    // トップページ（一般ユーザー用）
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+});
+
+// 管理者用のルーティンググループ（認証が必要）
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
     // 管理者ホームページ
     Route::get('home', [App\Http\Controllers\Admin\HomeController::class, 'index'])->name('home');
@@ -43,26 +69,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
     // 会社概要関連
     Route::get('company', [CompanyController::class, 'index'])->name('company.index');
     Route::get('company/{company}/edit', [CompanyController::class, 'edit'])->name('company.edit');
-    Route::put('company/{company}', [CompanyController::class, 'update'])->name('company.update');
+    Route::match(['put', 'patch'], 'company/{company}', [CompanyController::class, 'update'])->name('company.update');
+
 
     // 利用規約関連
     Route::get('terms', [TermController::class, 'index'])->name('terms.index');
     Route::get('terms/{term}/edit', [TermController::class, 'edit'])->name('terms.edit');
     Route::put('terms/{term}', [TermController::class, 'update'])->name('terms.update');
-});
-
-// ユーザー用のルート（認証済みユーザー）
-Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', function () {
-        return view('profile');  // 'profile' ビューを表示
-    })->name('profile');
-
-    // プロフィール編集フォーム
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-
-    // プロフィール情報の更新
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
-    // アカウント削除
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });

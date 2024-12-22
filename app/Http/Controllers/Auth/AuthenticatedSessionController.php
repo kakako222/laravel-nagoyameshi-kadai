@@ -27,9 +27,11 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        //セッションを再生成
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        //ログイン成功後、フラッシュメッセージをセッションに保存
+        return redirect()->intended(RouteServiceProvider::HOME)->with('flash_message', 'ログインしました。');
     }
 
     /**
@@ -39,10 +41,11 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
+        //セッションの無効化とトークンの再生成
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        //ログアウト後、フラッシュメッセージをセッションに保存
+        return redirect('/')->with('flash_message', 'ログアウトしました。');
     }
 }

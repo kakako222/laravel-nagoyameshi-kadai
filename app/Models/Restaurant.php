@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Kyslik\ColumnSortable\Sortable;
 
 class Restaurant extends Model
 {
-    use HasFactory;
+    use HasFactory, Sortable;
 
     protected $fillable = [
         'name',
@@ -21,6 +22,9 @@ class Restaurant extends Model
         'closing_time',
         'seating_capacity'
     ];
+
+    // 並べ替え可能なカラムを指定
+    public $sortable = ['name', 'lowest_price', 'highest_price', 'created_at'];
 
     /**
      * このレストランが関連するカテゴリを取得する。

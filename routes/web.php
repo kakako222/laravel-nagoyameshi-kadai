@@ -1,14 +1,15 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Admin\RestaurantController;
+use App\Http\Controllers\Admin\RestaurantController as AdminRestaurantController;
+use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\TermController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 
 require __DIR__ . '/auth.php';
@@ -38,15 +39,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); // 削除
 });
 
-// ゲスト（管理者としてログインしていない状態）用のルートグループ
-/*
-Route::group(['middleware' => 'guest'], function () {
-    // トップページ（一般ユーザー用）
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+// 店舗一覧ページ（管理者としてログインしていない場合にのみアクセス可能）
+Route::middleware(['guest'])->group(function () {
+    Route::resource('restaurants',  App\Http\Controllers\RestaurantController::class)->only(['index']); // 店舗一覧（管理者としてログインしていない状態でアクセス）
 });
-*/
 
+// ゲスト（管理者としてログインしていない状態）用のルートグループ
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
 
 // 管理者用ルート(認証が必要)
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
@@ -55,7 +55,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
     Route::get('users/{user}', [AdminUserController::class, 'show'])->name('users.show');  // 会員詳細ページ
     Route::patch('users/{user}', [AdminUserController::class, 'update'])->name('user.update');
 
-    Route::resource('restaurants', RestaurantController::class); // 店舗関連のルート(edit)
+    Route::resource('restaurants', AdminRestaurantController::class); // 店舗関連のルート(edit)
     Route::resource('categories', CategoryController::class)->except(['show']);  // カテゴリ管理
 
     // 会社概要関連

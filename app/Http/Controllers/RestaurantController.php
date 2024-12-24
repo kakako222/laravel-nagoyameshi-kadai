@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class RestaurantController extends Controller
 {
@@ -16,8 +17,14 @@ class RestaurantController extends Controller
      */
     public function index(Request $request)
     {
+        // ログインしているユーザーが管理者の場合
+        if (Auth::guard('admin')->check()) {
+            // 管理者が店舗一覧ページにアクセスしようとした場合、admin.homeにリダイレクト
+            return redirect()->route('admin.home');
+        }
+
+        // ログインしているユーザーが会員の場合、店舗一覧を表示
         Log::info('Authenticated user:', ['user' => auth()->user()]);
-        // 他のログや処理
 
         // 並べ替え用の$sorts配列
         $sorts = [

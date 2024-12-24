@@ -45,8 +45,6 @@ class RestaurantTest extends TestCase
         // ログイン状態で店舗一覧ページにアクセス
         $response = $this->withoutMiddleware()->actingAs($user)->get(route('restaurants.index'));
 
-
-
         // ステータスコード200（正常なアクセス）を確認
         $response->assertStatus(200);
     }
@@ -64,10 +62,10 @@ class RestaurantTest extends TestCase
         $admin->password = Hash::make('nagoyameshi');
         $admin->save();
 
-        $this->actingAs($admin, 'admin');  // 'admin' ガードでログイン
+        $this->actingAs($admin);
 
         // 店舗一覧ページにアクセス
-        $response = $this->get(route('restaurants.index'));
+        $response = $this->withoutMiddleware()->actingAs($admin, 'admin')->get(route('restaurants.index'));
         $response->assertStatus(302);
 
         // リダイレクト先を確認

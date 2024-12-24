@@ -97,7 +97,6 @@ class RestaurantController extends Controller
         // 画像アップロード処理
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('public/restaurants');
-            \Log::info('Image Path: ' . $imagePath); // デバッグ用ログ
             $restaurant->image = basename($imagePath);  // 画像パスを保存
         }
 

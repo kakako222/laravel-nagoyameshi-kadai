@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Admin\RestaurantController as AdminRestaurantController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\Admin\RestaurantController as AdminRestaurantController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\TermController;
@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user', [UserController::class, 'index'])->name('user.index');
     Route::get('user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::put('user/{user}', [UserController::class, 'update'])->name('user.update');
+    Route::get('restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
 
     // プロフィール関連ルート
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show'); // 表示
@@ -55,6 +56,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
     Route::get('users/{user}', [AdminUserController::class, 'show'])->name('users.show');  // 会員詳細ページ
     Route::patch('users/{user}', [AdminUserController::class, 'update'])->name('user.update');
 
+    Route::get('restaurants', [AdminRestaurantController::class, 'index'])->name('admin.restaurants.index');
     Route::resource('restaurants', AdminRestaurantController::class); // 店舗関連のルート(edit)
     Route::resource('categories', CategoryController::class)->except(['show']);  // カテゴリ管理
 

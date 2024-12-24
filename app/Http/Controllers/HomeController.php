@@ -27,6 +27,9 @@ class HomeController extends Controller
         // 新着レストラン（作成日時が新しい順で6件取得）
         $new_restaurants = Restaurant::orderBy('created_at', 'desc')->take(6)->get();
 
+        // データが正しく取得できているか確認
+        dd($highly_rated_restaurants, $new_restaurants);
+
         // ビューにデータを渡して表示
         return view('home', compact('highly_rated_restaurants', 'categories', 'new_restaurants'));
     }

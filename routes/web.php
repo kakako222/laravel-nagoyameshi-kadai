@@ -14,10 +14,6 @@ use App\Http\Controllers\ProfileController;
 
 require __DIR__ . '/auth.php';
 
-//Route::get('/profile', function () {
-//return view('profile');
-//})->name('profile');
-
 // 管理者用認証ルート（認証不要）
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -33,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('user/{user}', [UserController::class, 'update'])->name('user.update');
     Route::get('restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
 
+
     // プロフィール関連ルート
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show'); // 表示
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit'); // 編集フォーム
@@ -40,13 +37,20 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); // 削除
 });
 
-// 店舗一覧ページ（管理者としてログインしていない場合にのみアクセス可能）
-Route::middleware(['guest'])->group(function () {
-    Route::resource('restaurants',  App\Http\Controllers\RestaurantController::class)->only(['index']); // 店舗一覧（管理者としてログインしていない状態でアクセス）
+// 一般ユーザーやゲスト用ルート
+Route::group(['middleware' => 'guest:admin'], function () {
+    // トップページ
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::resource('restaurants', RestaurantController::class)->only(['index', 'show'])->names('restaurants');
 });
 
+// 店舗一覧ページ（管理者としてログインしていない場合にのみアクセス可能）
+//Route::middleware(['guest'])->group(function () {
+//  Route::resource('restaurants',  App\Http\Controllers\RestaurantController::class)->only(['index']); // 店舗一覧（管理者としてログインしていない状態でアクセス）
+//});
+
 // ゲスト（管理者としてログインしていない状態）用のルートグループ
-Route::get('/', [HomeController::class, 'index'])->name('home');
+//Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 // 管理者用ルート(認証が必要)

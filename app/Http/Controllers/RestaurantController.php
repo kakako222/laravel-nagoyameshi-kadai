@@ -90,4 +90,8 @@ class RestaurantController extends Controller
         // ビューにデータを渡して表示
         return view('restaurants.index', compact('restaurants', 'keyword', 'category_id', 'price', 'sorts', 'sorted', 'categories', 'total'));
     }
+    //public function show(Restaurant $restaurant)
+    //{
+    //  return view('restaurants.show', compact('restaurant'));
+    //}
 }

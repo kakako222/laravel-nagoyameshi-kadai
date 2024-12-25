@@ -80,129 +80,124 @@
                             @endif
                         </div>
                     </div>
-                    <p class="card-text">
                 </div>
-                <span class="nagoyameshi-star-rating me-1" data-rate="{{ round($highly_rated_restaurant->reviews->avg('score') * 2) / 2 }}"></span>
-                {{ number_format(round($highly_rated_restaurant->reviews->avg('score'), 2), 2) }}
-                </p>
+            </a>
         </div>
-        </a>
+        @endforeach
     </div>
-    @endforeach
-</div>
 
-<h2 class="mb-3">カテゴリから探す</h2>
-<div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-3">
-    <div class="col">
-        <a href="{{ url("/restaurants/?category_id={$categories->where('name', '和食')->value('id')}") }}" class="nagoyameshi-card-link">
-            <div class="card text-white">
-                <img src="{{ asset('/images/washoku.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="和食">
-                <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
-                    <h3 class="card-title nagoyameshi-category-name">和食</h5>
+    <h2 class="mb-3">カテゴリから探す</h2>
+    <div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-3">
+        <div class="col">
+            <a href="{{ url("/restaurants/?category_id={$categories->where('name', '和食')->value('id')}") }}" class="nagoyameshi-card-link">
+                <div class="card text-white">
+                    <img src="{{ asset('/images/washoku.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="和食">
+                    <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
+                        <h3 class="card-title nagoyameshi-category-name">和食</h5>
+                    </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
 
-    <div class="col">
-        <a href="{{ url("/restaurants/?category_id={$categories->where('name', 'うどん')->value('id')}") }}" class="nagoyameshi-card-link">
-            <div class="card text-white">
-                <img src="{{ asset('/images/udon.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="うどん">
-                <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
-                    <h3 class="card-title nagoyameshi-category-name">うどん</h5>
+        <div class="col">
+            <a href="{{ url("/restaurants/?category_id={$categories->where('name', 'うどん')->value('id')}") }}" class="nagoyameshi-card-link">
+                <div class="card text-white">
+                    <img src="{{ asset('/images/udon.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="うどん">
+                    <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
+                        <h3 class="card-title nagoyameshi-category-name">うどん</h5>
+                    </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
 
-    <div class="col">
-        <a href="{{ url("/restaurants/?category_id={$categories->where('name', '丼物')->value('id')}") }}" class="nagoyameshi-card-link">
-            <div class="card text-white">
-                <img src="{{ asset('/images/don.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="丼物">
-                <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
-                    <h3 class="card-title nagoyameshi-category-name">丼物</h5>
+        <div class="col">
+            <a href="{{ url("/restaurants/?category_id={$categories->where('name', '丼物')->value('id')}") }}" class="nagoyameshi-card-link">
+                <div class="card text-white">
+                    <img src="{{ asset('/images/don.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="丼物">
+                    <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
+                        <h3 class="card-title nagoyameshi-category-name">丼物</h5>
+                    </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
 
-    <div class="col">
-        <a href="{{ url("/restaurants/?category_id={$categories->where('name', 'ラーメン')->value('id')}") }}" class="nagoyameshi-card-link">
-            <div class="card text-white">
-                <img src="{{ asset('/images/ramen.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="ラーメン">
-                <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
-                    <h3 class="card-title nagoyameshi-category-name">ラーメン</h5>
+        <div class="col">
+            <a href="{{ url("/restaurants/?category_id={$categories->where('name', 'ラーメン')->value('id')}") }}" class="nagoyameshi-card-link">
+                <div class="card text-white">
+                    <img src="{{ asset('/images/ramen.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="ラーメン">
+                    <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
+                        <h3 class="card-title nagoyameshi-category-name">ラーメン</h5>
+                    </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
 
-    <div class="col">
-        <a href="{{ url("/restaurants/?category_id={$categories->where('name', 'おでん')->value('id')}") }}" class="nagoyameshi-card-link">
-            <div class="card text-white">
-                <img src="{{ asset('/images/oden.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="おでん">
-                <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
-                    <h3 class="card-title nagoyameshi-category-name">おでん</h5>
+        <div class="col">
+            <a href="{{ url("/restaurants/?category_id={$categories->where('name', 'おでん')->value('id')}") }}" class="nagoyameshi-card-link">
+                <div class="card text-white">
+                    <img src="{{ asset('/images/oden.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="おでん">
+                    <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
+                        <h3 class="card-title nagoyameshi-category-name">おでん</h5>
+                    </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
 
-    <div class="col">
-        <a href="{{ url("/restaurants/?category_id={$categories->where('name', '揚げ物')->value('id')}") }}" class="nagoyameshi-card-link">
-            <div class="card text-white">
-                <img src="{{ asset('/images/fried.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="揚げ物">
-                <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
-                    <h3 class="card-title nagoyameshi-category-name">揚げ物</h5>
+        <div class="col">
+            <a href="{{ url("/restaurants/?category_id={$categories->where('name', '揚げ物')->value('id')}") }}" class="nagoyameshi-card-link">
+                <div class="card text-white">
+                    <img src="{{ asset('/images/fried.jpg') }}" class="card-img nagoyameshi-vertical-card-image" alt="揚げ物">
+                    <div class="card-img-overlay d-flex justify-content-center align-items-center nagoyameshi-overlay-background">
+                        <h3 class="card-title nagoyameshi-category-name">揚げ物</h5>
+                    </div>
                 </div>
-            </div>
-        </a>
+            </a>
+        </div>
     </div>
-</div>
-<div class="mb-5">
-    @foreach ($categories as $category)
-    @if ($category->name === '和食' || $category->name === 'うどん' || $category->name === '丼物' || $category->name === 'ラーメン' || $category->name === 'おでん' || $category->name === '揚げ物')
-    @continue
-    @else
-    <a href="{{ url("/restaurants/?category_id={$category->id}") }}" class="btn btn-outline-secondary btn-sm me-1 mb-2">{{ $category->name }}</a>
-    @endif
-    @endforeach
-</div>
+    <div class="mb-5">
+        @foreach ($categories as $category)
+        @if ($category->name === '和食' || $category->name === 'うどん' || $category->name === '丼物' || $category->name === 'ラーメン' || $category->name === 'おでん' || $category->name === '揚げ物')
+        @continue
+        @else
+        <a href="{{ url("/restaurants/?category_id={$category->id}") }}" class="btn btn-outline-secondary btn-sm me-1 mb-2">{{ $category->name }}</a>
+        @endif
+        @endforeach
+    </div>
 
-<h2 class="mb-3">新規掲載店</h2>
-<div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-5">
-    @foreach ($new_restaurants as $new_restaurant)
-    <div class="col">
-        <a href="{{ route('restaurants.show', $new_restaurant) }}" class="link-dark nagoyameshi-card-link">
-            <div class="card h-100">
-                @if ($new_restaurant->image !== '')
-                <img src="{{ asset('storage/restaurants/' . $new_restaurant->image) }}" class="card-img-top nagoyameshi-vertical-card-image">
-                @else
-                <img src="{{ asset('/images/no_image.jpg') }}" class="card-img-top nagoyameshi-vertical-card-image" alt="画像なし">
-                @endif
-                <div class="card-body">
-                    <h3 class="card-title">{{ $new_restaurant->name }}</h3>
-                    <div class="text-muted small mb-1">
-                        @if ($new_restaurant->categories()->exists())
-                        @foreach ($new_restaurant->categories as $index => $category)
-                        <div class="d-inline-block">
-                            @if ($index === 0)
-                            {{ $category->name }}
+    <h2 class="mb-3">新規掲載店</h2>
+    <div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-5">
+        @foreach ($new_restaurants as $new_restaurant)
+        <div class="col">
+            <a href="{{ route('restaurants.show', $new_restaurant) }}" class="link-dark nagoyameshi-card-link">
+                <div class="card h-100">
+                    @if ($new_restaurant->image !== '')
+                    <img src="{{ asset('storage/restaurants/' . $new_restaurant->image) }}" class="card-img-top nagoyameshi-vertical-card-image">
+                    @else
+                    <img src="{{ asset('/images/no_image.jpg') }}" class="card-img-top nagoyameshi-vertical-card-image" alt="画像なし">
+                    @endif
+                    <div class="card-body">
+                        <h3 class="card-title">{{ $new_restaurant->name }}</h3>
+                        <div class="text-muted small mb-1">
+                            @if ($new_restaurant->categories()->exists())
+                            @foreach ($new_restaurant->categories as $index => $category)
+                            <div class="d-inline-block">
+                                @if ($index === 0)
+                                {{ $category->name }}
+                                @else
+                                {{ ' ' . $category->name }}
+                                @endif
+                            </div>
+                            @endforeach
                             @else
-                            {{ ' ' . $category->name }}
+                            <span>カテゴリ未設定</span>
                             @endif
                         </div>
-                        @endforeach
-                        @else
-                        <span>カテゴリ未設定</span>
-                        @endif
+                        <p class="card-text">{{ mb_substr($new_restaurant->description, 0, 19) }}@if (mb_strlen($new_restaurant->description) > 19)...@endif</p>
                     </div>
-                    <p class="card-text">{{ mb_substr($new_restaurant->description, 0, 19) }}@if (mb_strlen($new_restaurant->description) > 19)...@endif</p>
                 </div>
-            </div>
-        </a>
+            </a>
+        </div>
+        @endforeach
     </div>
-    @endforeach
-</div>
 </div>
 @endsection

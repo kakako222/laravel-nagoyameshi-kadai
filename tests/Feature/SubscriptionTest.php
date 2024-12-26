@@ -40,8 +40,9 @@ class SubscriptionTest extends TestCase
         // ページにアクセス
         $response = $this->get(route('subscription.create'));
 
-        // リダイレクト
-        $response->assertRedirect(route('subscription.create'));
+        // リダイレクト<-リダイレクトではなくそのままcreateにアクセスできる？
+        //$response->assertRedirect(route('subscription.create'));
+        $response->assertStatus(200);
     }
 
 

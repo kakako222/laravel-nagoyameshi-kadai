@@ -18,22 +18,20 @@ class NotSubscribed
     {
         $user = Auth::user();
 
-        // 管理者の場合、サブスクリプションのチェックをスキップ
+        // 管理者の場合、サブスクリプションのチェックをスキップし、リダイレクト
         if ($user instanceof \App\Models\Admin) {
-            return $next($request); // 管理者はそのまま処理を続行
+            return redirect()->route('admin.home'); // 管理者はホームにリダイレクト
         }
 
-        // ユーザーがサブスクリプションを持っていない場合
+        // サブスクリプションに未加入のユーザーがcreateページにアクセスできるようにする
         if (! $user?->subscribed('premium_plan')) {
+            // createページへのアクセスは許可
             if ($request->is('subscription/create')) {
-                return redirect()->route('subscription.create');
+                return $next($request); // createページへ遷移
             }
 
-            if ($request->is('subscription/store')) {
-                return redirect()->route('subscription.create');
-            }
-
-            return redirect()->route('home'); // デフォルトはhomeにリダイレクト
+            // その他のページはhomeにリダイレクト
+            return redirect()->route('home');
         }
 
         return $next($request);

@@ -23,6 +23,7 @@ class SubscriptionController extends Controller
         // 管理者の情報を取得
         $admin = Auth::guard('admin')->user();
         if ($admin) {
+
             // 管理者がサブスクリプションページにアクセスしようとした場合はリダイレクト
             return redirect()->route('admin.home');
         }

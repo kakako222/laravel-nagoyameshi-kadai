@@ -5,33 +5,32 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Laravel\Cashier\Billable;
 use Illuminate\Support\Facades\Auth;
 
 class NotSubscribed
 {
-    /**
+    /**有料プランに未登録
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = Auth::user();
-
-        // 管理者の場合、サブスクリプションのチェックをスキップし、リダイレクト
-        if ($user instanceof \App\Models\Admin) {
-            return redirect()->route('admin.home'); // 管理者はホームにリダイレクト
+        $user = Auth::user(); // ユーザー情報を取得
+        // 未ログインの場合、会員登録ページにリダイレクト
+        if (!$user) {
+            return redirect()->route('login');
         }
 
-        // サブスクリプションに未加入のユーザーがcreateページにアクセスできるようにする
-        if (! $user?->subscribed('premium_plan')) {
-            // createページへのアクセスは許可
-            if ($request->is('subscription/create')) {
-                return $next($request); // createページへ遷移
-            }
+        // 管理者がアクセスしてきた場合は管理者ホームにリダイレクト
+        if ($user->is_admin) {
+            return redirect()->route('admin.home');
+        }
 
-            // その他のページはhomeにリダイレクト
-            return redirect()->route('home');
+        // すでに有料会員のユーザーは、編集ページにリダイレクト
+        if ($user->subscribed('premium_plan')) {
+            return redirect()->route('subscription.edit');
         }
 
         return $next($request);

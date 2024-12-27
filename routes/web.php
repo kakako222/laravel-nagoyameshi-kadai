@@ -27,6 +27,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
+// 管理者用ルート(認証が必要)
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth:admin', NotSubscribed::class]], function () {
+    Route::get('home', [App\Http\Controllers\Admin\HomeController::class, 'index'])->name('home'); // 管理者ホーム
+
+});
+
 // 一般ユーザー用ルート
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -60,20 +66,34 @@ Route::group(['middleware' => 'guest:admin'], function () {
 
 
 // 有料プラン未登録の一般ユーザー用ルート
-Route::middleware(['auth', 'verified', 'notSubscribed', 'guest:admin'])->group(function () {
-    Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create'); // 登録ページ
-    Route::post('subscription/store', [SubscriptionController::class, 'store'])->name('subscription.store');         // 登録機能
+//Route::middleware(['auth', 'verified', 'notSubscribed', 'guest:admin'])->group(function () {
+//  Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create'); // 登録ページ
+//Route::post('subscription/store', [SubscriptionController::class, 'store'])->name('subscription.store');         // 登録機能
+//});
+
+//有料プラン未登録（一般ユーザとしてログイン済かつメール認証済）
+Route::group(['middleware' => [NotSubscribed::class]], function () {
+    Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');
+    Route::post('subscription', [SubscriptionController::class, 'store'])->name('subscription.store');
 });
 
-// 有料プラン登録済みの一般ユーザー用ルート
-Route::middleware(['auth', 'verified', 'subscribed', 'guest:admin'])->group(function () {
-    //Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');       // 編集ページ
-    Route::get('subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');       // 編集ページ
-    Route::put('subscription/update', [SubscriptionController::class, 'update'])->name('subscription.update');       // 更新機能
-    Route::patch('subscription/update', [SubscriptionController::class, 'update']);                                  // 更新機能（PATCH）
-    Route::get('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel'); // 解約ページ
-    Route::delete('subscription/destroy', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');   // 解約機能
+//一般ユーザとしてログイン済かつメール認証済で有料プラン登録済の場合
+Route::group(['middleware' => [Subscribed::class]], function () {
+    Route::get('subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
+    Route::patch('subscription', [SubscriptionController::class, 'update'])->name('subscription.update');
+    Route::get('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::delete('subscription', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
 });
+
+// 有料プラン登録済みの一般ユーザー用ルート(認証)
+//Route::middleware(['auth', 'verified', 'subscribed', 'guest:admin'])->group(function () {
+//Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');       // 編集ページ
+//Route::get('subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');       // 編集ページ
+//Route::put('subscription/update', [SubscriptionController::class, 'update'])->name('subscription.update');       // 更新機能
+//Route::patch('subscription/update', [SubscriptionController::class, 'update']);                                  // 更新機能（PATCH）
+//Route::get('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel'); // 解約ページ
+//Route::delete('subscription/destroy', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');   // 解約機能
+//});
 
 
 // 管理者用ルート(認証が必要)

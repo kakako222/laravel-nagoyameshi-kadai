@@ -2,43 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\HomeController;
-use App\Models\User;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
-use Stripe\Stripe;
-use Laravel\Cashier\Cashier;
-use Illuminate\Support\Facades\Session;
+use App\Models\User;
+
 
 
 
 class SubscriptionController extends Controller
 {
-
+    public function __construct()
+    {
+        // 未ログインのユーザーはアクセスできないようにする
+        $this->middleware('auth');
+    }
 
     public function create()
     {
-
-        // 管理者の情報を取得
-        $admin = Auth::guard('admin')->user();
-        if ($admin) {
-
-            // 管理者がサブスクリプションページにアクセスしようとした場合はリダイレクト
-            return redirect()->route('admin.home');
+        if (!Auth::check()) {
+            // ユーザーが未ログインの場合はリダイレクト
+            return redirect()->route('login');
         }
+        $intent = Auth::user()->createSetupIntent();
 
-        // 通常ユーザー（無料会員や有料会員）を取得
-        $user = Auth::user();
-
-        // ユーザーがサブスクリプションページにアクセスできるかどうか
-        if ($user && $user->subscribed('premium_plan')) {
-            // 有料会員の場合、ホームページにリダイレクト
-            return redirect()->route('home');
-        }
-
-        // サブスクリプションがないユーザー、または無料会員がcreateページにアクセス
-        $intent = $user->createSetupIntent(); // SetupIntentを作成
         return view('subscription.create', compact('intent'));
     }
 
@@ -72,7 +61,6 @@ class SubscriptionController extends Controller
             return redirect()->route('admin.home');
         }
         $user = Auth::user();
-
 
         // 現在ログイン中のユーザーのSetupIntentオブジェクトを作成
         $intent = $user->createSetupIntent();

@@ -40,8 +40,6 @@ class SubscriptionTest extends TestCase
         // ページにアクセス
         $response = $this->get(route('subscription.create'));
 
-        // リダイレクト<-リダイレクトではなくそのままcreateにアクセスできる？
-        //$response->assertRedirect(route('subscription.create'));
         $response->assertStatus(200);
     }
 
@@ -57,11 +55,11 @@ class SubscriptionTest extends TestCase
         $response = $this->actingAs($user)->get(route('subscription.create'));
 
         // リダイレクト
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('subscription.edit'));
     }
 
 
-    //4 ログイン済みの管理者は有料プラン登録ページにアクセスできない
+    //4 ログイン済みの管理者は有料プラン登録ページにアクセスできない//////////////////////////////////////////////////////////////
     public function test_admin_cannot_access_subscription_create()
     {
         // 管理者ユーザーを作成
@@ -71,10 +69,11 @@ class SubscriptionTest extends TestCase
         $admin->save();
 
         // 管理者としてログインし、サブスク登録へ
-        $response = $this->actingAs($admin, 'admin')->get(route('admin.subscription.create'));
+        $response = $this->actingAs($admin, 'admin')->get(route('subscription.create'));
 
         // リダイレクト
         $response->assertRedirect(route('admin.home'));
+        dd(route('admin.home'));
     }
 
     /////////store/////////
@@ -98,14 +97,14 @@ class SubscriptionTest extends TestCase
         // 無料会員が有料プランに登録できるように、サブスクリプションを作成
         $user->newSubscription('premium_plan', 'price_1QZk9BK6fTyCyP966vB53Xje')->create('pm_card_visa');
 
-        // サブスクリプション作成後にリダイレクト先を確認
+        // サブスク作成後にリダイレクト先を確認
         // ここで実際に `subscription.store` へのPOSTリクエストを送信する必要があります
         $response = $this->post(route('subscription.store'), [
             'paymentMethodId' => 'pm_card_visa', // StripeのカードID
         ]);
 
-        // リダイレクトが home ルートに行くことを確認
-        $response->assertRedirect(route('home'));
+        // リダイレクト
+        $response->assertRedirect(route('subscription.edit'));
 
         // ユーザーがプレミアムプランに登録されたかを確認
         $user->refresh();
@@ -131,11 +130,11 @@ class SubscriptionTest extends TestCase
         $response = $this->post(route('subscription.store'), $request_parameter);
 
         // リダイレクト先が home であることを確認
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('subscription.edit'));
     }
 
 
-    //4 ログイン済みの管理者は有料プランに登録できない
+    //4 ログイン済みの管理者は有料プランに登録できない/////////////////////////////////////////////////////////////////////
     public function test_admin_cannot_access_subscription_store()
     {
         $admin = new Admin();

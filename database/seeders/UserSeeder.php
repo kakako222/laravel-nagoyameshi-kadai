@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // 100件のダミーユーザーデータを生成
-        User::factory()->count(100)->create();
+        User::factory()->count(1)->create();
         $user = new User();
         $user->name = "課題レビュー";
         $user->kana = "カダイレビュー";

@@ -120,15 +120,14 @@ class ReviewController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return redirect()->route('reviews.index', $restaurant)
-            ->with('flash_message', 'レビューを投稿しました。');
+        return redirect()->route('restaurants.reviews.index', $restaurant)->with('flash_message', 'レビューを投稿しました。');
     }
 
     // レビュー編集ページ
     public function edit(Restaurant $restaurant, Review $review)
     {
         if ($review->user_id !== Auth::id()) {
-            return redirect()->route('reviews.index', $restaurant)
+            return redirect()->route('restaurants.reviews.index', $restaurant)
                 ->with('error_message', '不正なアクセスです。');
         }
 
@@ -144,7 +143,7 @@ class ReviewController extends Controller
     {
         // ユーザーが自分のレビューを更新しているか確認
         if ($review->user_id !== Auth::id()) {
-            return redirect()->route('reviews.index', $restaurant)
+            return redirect()->route('restaurants.reviews.index', $restaurant)
                 ->with('error_message', '不正なアクセスです。');
         }
 
@@ -165,8 +164,7 @@ class ReviewController extends Controller
             'content' => $request->content,
         ]);
 
-        return redirect()->route('reviews.index', $restaurant)
-            ->with('flash_message', 'レビューを編集しました。');
+        return redirect()->route('restaurants.reviews.index', $restaurant)->with('flash_message', 'レビューを編集しました。');
     }
 
 
@@ -175,7 +173,7 @@ class ReviewController extends Controller
     {
         // ユーザーが自分のレビューを削除しているか確認
         if ($review->user_id !== Auth::id()) {
-            return redirect()->route('reviews.index', $restaurant)
+            return redirect()->route('restaurants.reviews.index', $restaurant)
                 ->with('error_message', '不正なアクセスです。');
         }
 

@@ -17,7 +17,6 @@ class NotSubscribed
      */
     public function handle(Request $request, Closure $next): Response
     {
-        dd('fuga');
         $user = Auth::user(); // ユーザー情報を取得
         // 未ログインの場合、会員登録ページにリダイレクト
         if (!$user) {

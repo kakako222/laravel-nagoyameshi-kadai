@@ -17,7 +17,6 @@ class Subscribed
      */
     public function handle(Request $request, Closure $next): Response
     {
-        dd('hoge');
         $user = Auth::user();
 
         // ゲストユーザーの場合は、ログインページにリダイレクト

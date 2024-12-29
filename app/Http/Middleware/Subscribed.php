@@ -17,11 +17,23 @@ class Subscribed
      */
     public function handle(Request $request, Closure $next): Response
     {
+        dd('hoge');
         $user = Auth::user();
+
+        // ゲストユーザーの場合は、ログインページにリダイレクト
+        if (Auth::guest()) {
+            return redirect()->route('login');
+        }
+
+        // 管理者はアクセスできないようにする
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.home');
+        }
 
         if (! $request->user()?->subscribed('premium_plan')) {
             return redirect('subscription/create');
         }
+
         return $next($request);
     }
 }

@@ -73,7 +73,6 @@ class SubscriptionTest extends TestCase
 
         // リダイレクト
         $response->assertRedirect(route('admin.home'));
-        dd(route('admin.home'));
     }
 
     /////////store/////////

@@ -42,12 +42,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
     Route::get('/subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create'); //登録ページ
     Route::post('/subscription/store', [SubscriptionController::class, 'store'])->name('subscription.store'); //登録機能
-    Route::get('restaurants/{restaurant}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
-    Route::get('restaurants/{restaurant}/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
-    Route::post('restaurants/{restaurant}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-    Route::get('restaurants/{restaurant}/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
-    Route::put('restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
-    Route::delete('restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('restaurants.reviews.store', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('restaurants.reviews.edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::patch('restaurants.reviews.update', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('restaurants.reviews.destroy', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    //Route::resource('restaurants.reviews', ReviewController::class)
+    //  ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']) // 必要なアクションのみ指定
+    //      ->names('restaurants.reviews');
 
 
     // プロフィール
@@ -58,43 +59,40 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // 一般ユーザーやゲスト用ルート
-Route::group(['middleware' => 'guest:admin'], function () {
+Route::group(['middleware' => 'guest'], function () {
     // トップページ
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::resource('restaurants', RestaurantController::class)->only(['index', 'show'])->names('restaurants');
+    Route::get('restaurants.reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('restaurants.reviews.create', [ReviewController::class, 'create'])->name('reviews.create');
 });
 
-
-// 有料プラン未登録の一般ユーザー用ルート
-//Route::middleware(['auth', 'verified', 'notSubscribed', 'guest:admin'])->group(function () {
-//  Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create'); // 登録ページ
-//Route::post('subscription/store', [SubscriptionController::class, 'store'])->name('subscription.store');         // 登録機能
-//});
-
 //有料プラン未登録（一般ユーザとしてログイン済かつメール認証済）
-Route::group(['middleware' => [NotSubscribed::class]], function () {
+Route::group(['middleware' => ['auth', NotSubscribed::class]], function () {
     Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');
     Route::post('subscription', [SubscriptionController::class, 'store'])->name('subscription.store');
+    Route::get('restaurants.reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('restaurants/{restaurant}/reviews/create', [ReviewController::class, 'create'])->name('restaurants.reviews.create');
+    Route::post('restaurants/{restaurant}/reviews/store', [ReviewController::class, 'store'])->name('restaurants.reviews.store');
+    Route::get('restaurants/{restaurant}/reviews/edit/{review}', [ReviewController::class, 'edit'])->name('restaurants.reviews.edit');
+    Route::patch('restaurants/{restaurant}/reviews/update/{review}', [ReviewController::class, 'update'])->name('restaurants.reviews.update');
+    Route::delete('restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
 //一般ユーザとしてログイン済かつメール認証済で有料プラン登録済の場合
-Route::group(['middleware' => [Subscribed::class]], function () {
+Route::group(['middleware' => ['auth', Subscribed::class]], function () {
     Route::get('subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
     Route::patch('subscription', [SubscriptionController::class, 'update'])->name('subscription.update');
     Route::get('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
     Route::delete('subscription', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
+    Route::get('restaurants/{restaurant}/reviews', [ReviewController::class, 'index'])->name('restaurants.reviews.index');
+    Route::get('restaurants/{restaurant}/reviews/edit/{review}', [ReviewController::class, 'edit'])->name('restaurants.reviews.edit'); // 編集画面へのルート追加
+    Route::get('restaurants/{restaurant}/reviews/create', [ReviewController::class, 'create'])->name('restaurants.reviews.create');
+    Route::post('restaurants/{restaurant}/reviews/store', [ReviewController::class, 'store'])->name('restaurants.reviews.store');
+    //Route::get('restaurants/{restaurant}/reviews/edit', [ReviewController::class, 'edit'])->name('restaurants.reviews.edit');
+    Route::patch('restaurants/{restaurant}/reviews/update/{review}', [ReviewController::class, 'update'])->name('restaurants.reviews.update');
+    Route::delete('restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
-
-// 有料プラン登録済みの一般ユーザー用ルート(認証)
-//Route::middleware(['auth', 'verified', 'subscribed', 'guest:admin'])->group(function () {
-//Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');       // 編集ページ
-//Route::get('subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');       // 編集ページ
-//Route::put('subscription/update', [SubscriptionController::class, 'update'])->name('subscription.update');       // 更新機能
-//Route::patch('subscription/update', [SubscriptionController::class, 'update']);                                  // 更新機能（PATCH）
-//Route::get('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel'); // 解約ページ
-//Route::delete('subscription/destroy', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');   // 解約機能
-//});
-
 
 // 管理者用ルート(認証が必要)
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {

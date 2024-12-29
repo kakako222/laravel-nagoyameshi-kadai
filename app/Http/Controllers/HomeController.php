@@ -18,8 +18,7 @@ class HomeController extends Controller
         }
 
         // 評価が高いレストラン（評価順で並べ替えて6件取得）
-        $highly_rated_restaurants = Restaurant::take(6)->get();
-
+        $highly_rated_restaurants = Restaurant::withAvg('reviews', 'score')->orderBy('reviews_avg_score', 'desc')->take(6)->get();
         // すべてのカテゴリデータ
         $categories = Category::all();
 

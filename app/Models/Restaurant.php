@@ -34,19 +34,26 @@ class Restaurant extends Model
         return $this->belongsToMany(Category::class, 'category_restaurant');
     }
 
-    //定休日
-    // App\Models\Restaurant.php
-
-    /*
-    public function regular_holidays()
+    /**
+     * 店舗の平均評価順で並べ替えるメソッド
+     */
+    public function ratingSortable($query, $direction)
     {
-        return $this->belongsToMany(RegularHoliday::class, 'regular_holiday_restaurant', 'restaurant_id', 'regular_holiday_id');
+        return $query->leftJoin('reviews', 'restaurants.id', '=', 'reviews.restaurant_id')
+            ->select('restaurants.*')
+            ->selectRaw('COALESCE(AVG(reviews.rating), 0) as average_rating')
+            ->groupBy('restaurants.id')
+            ->orderBy('average_rating', $direction);
     }
-        */
+
 
     public function regular_holidays()
     {
         return $this->belongsToMany(RegularHoliday::class, 'regular_holiday_restaurant', 'restaurant_id', 'regular_holiday_id')
             ->select('regular_holidays.id as holiday_id', 'regular_holidays.day'); // カラムにエイリアスをつける
+    }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

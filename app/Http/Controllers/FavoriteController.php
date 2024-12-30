@@ -10,10 +10,10 @@ class FavoriteController extends Controller
     //会員のお気に入り店舗一覧を表示
     public function index()
     {
-        // ログインユーザーのお気に入り店舗を新しい順に取得（ページネーションあり）
+        // ログインユーザーのお気に入り店舗を新しい順に取得（ページネーションここ）
         $favorite_restaurants = auth()->user()->favorite_restaurants()
             ->orderBy('restaurant_user.created_at', 'desc') // 作成日時で並び替え
-            ->paginate(15); // 1ページあたり15件
+            ->paginate(10);
 
         return view('favorites.index', compact('favorite_restaurants'));
     }

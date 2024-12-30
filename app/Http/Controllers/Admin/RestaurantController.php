@@ -108,9 +108,8 @@ class RestaurantController extends Controller
         $restaurant->categories()->sync($category_ids);  // カテゴリの関連付け
 
         // 定休日のID配列を同期
-        if (isset($validated['regular_holiday_ids'])) {
-            $restaurant->regular_holidays()->sync($validated['regular_holiday_ids']);
-        }
+        $category_ids = array_filter($request->input('category_ids'));
+        $restaurant->categories()->sync($category_ids);
 
         // フラッシュメッセージとリダイレクト
         return redirect()->route('admin.restaurants.index')

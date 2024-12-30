@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
-    /**
-     * 予約一覧ページを表示
-     */
+    // 予約一覧ページ
     public function index()
     {
         $reservations = Reservation::where('user_id', Auth::id())
@@ -21,17 +19,13 @@ class ReservationController extends Controller
         return view('reservations.index', compact('reservations'));
     }
 
-    /**
-     * 予約ページを表示
-     */
+    //予約ページ
     public function create(Restaurant $restaurant)
     {
         return view('reservations.create', compact('restaurant'));
     }
 
-    /**
-     * 予約機能
-     */
+    //予約機能
     public function store(Request $request, Restaurant $restaurant)
     {
         $request->validate([
@@ -52,9 +46,7 @@ class ReservationController extends Controller
         return redirect()->route('reservations.index')->with('flash_message', '予約が完了しました。');
     }
 
-    /**
-     * 予約キャンセル機能
-     */
+    //予約キャンセル機能
     public function destroy(Reservation $reservation)
     {
         if ($reservation->user_id !== Auth::id()) {

@@ -11,8 +11,8 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\FavoriteController;
-use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Admin\TermController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\TermController;
 
 
 /*

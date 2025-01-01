@@ -7,6 +7,7 @@ use App\Models\Restaurant;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Admin\R
 
 class RestaurantController extends Controller
 {
@@ -175,18 +176,27 @@ class RestaurantController extends Controller
     /**
      * 店舗編集ページ
      */
-    public function edit($id)
-    {
-        // 編集対象の店舗を取得
-        $restaurant = Restaurant::findOrFail($id);
+    //public function edit($id)
+    //{
+    // 編集対象の店舗を取得
+    //    $restaurant = Restaurant::findOrFail($id);
 
-        // 店舗に関連するカテゴリのIDの配列を取得
+    // 店舗に関連するカテゴリのIDの配列を取得
+    //   $category_ids = $restaurant->categories->pluck('id')->toArray();
+
+    // 全てのカテゴリを取得
+    //  $categories = Category::all();
+
+    // ビューにデータを渡す
+    // return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids'));
+    //}
+    public function edit(Restaurant $restaurant)
+    {
+
+        $categories = Category::all();
         $category_ids = $restaurant->categories->pluck('id')->toArray();
 
-        // 全てのカテゴリを取得
-        $categories = Category::all();
-
-        // ビューにデータを渡す
-        return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids'));
+        $regular_holidays = RegularHoliday::all();
+        return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids', 'regular_holidays'));
     }
 }

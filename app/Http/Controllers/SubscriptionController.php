@@ -19,7 +19,8 @@ class SubscriptionController extends Controller
         // 未ログインのユーザーはアクセスできないようにする
         $this->middleware('auth');
     }
-
+    ////////////////////create////////////////////////
+    //作成
     public function create()
     {
         if (!Auth::check()) {
@@ -31,9 +32,8 @@ class SubscriptionController extends Controller
         return view('subscription.create', compact('intent'));
     }
 
-
-
-    // 有料プラン登録機能
+    ////////////////////store////////////////////////
+    // 登録機能
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -53,13 +53,14 @@ class SubscriptionController extends Controller
         return redirect()->route('home');
     }
 
-    // 支払い方法編集
+    ////////////////////edit////////////////////////
+    // 編集ページ
     public function edit()
     {
         // 管理者がアクセスした場合
-        if (auth()->guard('admin')->check()) {
-            return redirect()->route('admin.home');
-        }
+        //if (auth()->guard('admin')->check()) {
+        //  return redirect()->route('admin.home');
+        //}
         $user = Auth::user();
 
         // 現在ログイン中のユーザーのSetupIntentオブジェクトを作成
@@ -68,25 +69,19 @@ class SubscriptionController extends Controller
     }
 
 
-
+    ////////////////////update////////////////////////
+    //更新
     public function update(Request $request)
     {
-        $user = Auth::user();  // 現在のユーザーを取得
-        $admin = Auth::guard('admin')->user();  // 管理者ユーザーを取得
+        $user = $request->user();
 
-        // 管理者がアクセスしようとした場合はホームページへ
-        if ($admin) {
-            return redirect()->route('admin.home');
-        }
+        $user->updateDefaultPaymentMethod($request->paymentMethodId);
 
-        // 管理者以外のユーザーが支払い方法を更新
-        $user->updateDefaultPaymentMethod($request->paymentMethod);
 
-        $request->session()->flash('flash_message', 'お支払い方法を変更しました');
-
-        return redirect()->route('home');
+        return redirect()->route('home')->with('flash_message', 'お支払方法を変更しました。');
     }
-
+    ////////////////////cancel//////////////////////
+    //解約ページ
     public function cancel()
     {
         $user = Auth::user();
@@ -106,8 +101,8 @@ class SubscriptionController extends Controller
     }
 
 
-
-    // 解約機能(destroy)
+    ////////////////////destroy//////////////////////
+    // 解約機能
     public function destroy()
     {
         $user = Auth::user();

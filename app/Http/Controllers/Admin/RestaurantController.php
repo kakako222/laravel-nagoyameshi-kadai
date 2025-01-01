@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
-use App\Models\Category;
 use App\Models\RegularHoliday;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Category;
+
 
 class RestaurantController extends Controller
 {
@@ -72,10 +74,10 @@ class RestaurantController extends Controller
             'opening_time' => 'required|before:closing_time',
             'closing_time' => 'required|after:opening_time',
             'seating_capacity' => 'required|numeric|min:0',
-            'category_ids' => 'nullable|array', // カテゴリIDの配列
-            'category_ids.*' => 'exists:categories,id',
-            'regular_holiday_ids' => 'array',  // 定休日のIDは配列として受け取る
-            'regular_holiday_ids.*' => 'exists:regular_holidays,id', // 定休日IDが正しいか確認
+            //'category_ids' => 'nullable|array', // カテゴリIDの配列
+            //'category_ids.*' => 'exists:categories,id',
+            //'regular_holiday_ids' => 'array',  // 定休日のIDは配列として受け取る
+            //'regular_holiday_ids.*' => 'exists:regular_holidays,id', // 定休日IDが正しいか確認
         ]);
 
         // 店舗データの作成
@@ -94,6 +96,8 @@ class RestaurantController extends Controller
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('public/restaurants');
             $restaurant->image = basename($imagePath);  // 画像パスを保存
+        } else {
+            $restaurant->image = "";
         }
 
         // 店舗情報をデータベースに保存
@@ -112,6 +116,20 @@ class RestaurantController extends Controller
         return redirect()->route('admin.restaurants.index')
             ->with('flash_message', '店舗を登録しました！');
     }
+    ///////////////////////edit/////////////////////////
+    //編集
+    public function edit(Restaurant $restaurant)
+    {
+
+        $categories = Category::all();
+        $category_ids = $restaurant->categories->pluck('id')->toArray();
+
+        $regular_holidays = RegularHoliday::all();
+
+        // ビューにデータを渡す
+        return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids', 'regular_holidays'));
+    }
+
 
     //////////////////////update/////////////////////////
     //更新
@@ -129,40 +147,36 @@ class RestaurantController extends Controller
             'opening_time' => 'required|date_format:H:i|before:closing_time',
             'closing_time' => 'required|date_format:H:i|after:opening_time',
             'seating_capacity' => 'required|integer|min:0',
-            'category_ids' => 'nullable|array',  // カテゴリIDの配列（オプション）
-            'category_ids.*' => 'exists:categories,id',
-            'regular_holiday_ids' => 'nullable|array',
-            'regular_holiday_ids.*' => 'exists:regular_holidays,id',
+            //'category_ids' => 'nullable|array',  // カテゴリIDの配列（オプション）
+            //'category_ids.*' => 'exists:categories,id',
+            //'regular_holiday_ids' => 'nullable|array',
+            //'regular_holiday_ids.*' => 'exists:regular_holidays,id',
         ]);
 
-        // 画像アップロード処理
+        $restaurant->name = $request->input('name');
+        $restaurant->description = $request->input('description');
+        $restaurant->lowest_price = $request->input('lowest_price');
+        $restaurant->highest_price = $request->input('highest_price');
+        $restaurant->postal_code = $request->input('postal_code');
+        $restaurant->address = $request->input('address');
+        $restaurant->opening_time = $request->input('opening_time');
+        $restaurant->closing_time = $request->input('closing_time');
+        $restaurant->seating_capacity = $request->input('seating_capacity');
+
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/restaurants');
-            $validated['image'] = basename($imagePath);
-
-            // 古い画像の削除
-            if ($restaurant->image && Storage::exists('public/restaurants/' . $restaurant->image)) {
-                Storage::delete('public/restaurants/' . $restaurant->image);
-            }
+            $image = $request->file('image')->store('public/restaurants');
+            $restaurant->image = basename($image);
         }
+        $restaurant->update();
 
-        // 店舗データの更新
-        $restaurant->update($validated);
-
-        // カテゴリの関連付けを同期
         $category_ids = array_filter($request->input('category_ids', []));
         $restaurant->categories()->sync($category_ids);
 
-        // 定休日の同期
-        if (isset($validated['regular_holiday_ids'])) {
-            $restaurant->regular_holidays()->sync($validated['regular_holiday_ids']);
-        }
+        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids', []));
+        $restaurant->regular_holidays()->sync($regular_holiday_ids);
 
-        // フラッシュメッセージとリダイレクト
-        return redirect()->route('admin.restaurants.show', $restaurant)
-            ->with('flash_message', '店舗を編集しました。');
+        return redirect()->route('admin.restaurants.show', $restaurant)->with('flash_message', '店舗を編集しました。');
     }
-
 
 
     //////////////////////detroy//////////////////////
@@ -182,28 +196,5 @@ class RestaurantController extends Controller
         // フラッシュメッセージを設定してリダイレクト
         return redirect()->route('admin.restaurants.index')
             ->with('flash_message', '店舗を削除しました。');
-    }
-
-    //////////////////////edit/////////////////////////
-    //編集
-    public function edit($id)
-    {
-        // 編集対象の店舗を取得
-        $restaurant = Restaurant::findOrFail($id);
-
-        // 店舗に関連するカテゴリのIDの配列を取得
-        $category_ids = $restaurant->categories->pluck('id')->toArray();
-
-        // 全てのカテゴリを取得
-        $categories = Category::all();
-
-        // 定休日のデータを取得
-        $regular_holidays = RegularHoliday::all();
-
-        // 店舗が選択している定休日のIDを取得
-        $selected_regular_holidays = $restaurant->regular_holidays()->pluck('id')->toArray();
-
-        // ビューにデータを渡す
-        return view('admin.restaurants.edit', compact('restaurant', 'categories', 'category_ids', 'regular_holidays', 'selected_regular_holidays'));
     }
 }

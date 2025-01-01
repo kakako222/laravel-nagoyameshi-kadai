@@ -46,6 +46,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         //ログアウト後、フラッシュメッセージをセッションに保存
-        return redirect('/')->with('flash_message', 'ログアウトしました。');
+        return redirect('/home')->with('flash_message', 'ログアウトしました。');
     }
 }

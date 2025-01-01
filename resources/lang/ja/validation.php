@@ -122,4 +122,20 @@ return [
 
     'attributes' => [],
 
+    'attributes' => [
+        'name' => '名前',
+        'description' => '説明',
+        'lowest_price' => '最低価格',
+        'highest_price' => '最高価格',
+        'postal_code' => '郵便番号',
+        'address' => '住所',
+        'opening_time' => '開店時間',
+        'closing_time' => '閉店時間',
+        'seating_capacity' => '座席数',
+        'category_ids' => 'カテゴリー',
+        'category_ids.0' => 'カテゴリー1',
+        'category_ids.1' => 'カテゴリー2',
+        'category_ids.2' => 'カテゴリー3',
+    ],
+
 ];

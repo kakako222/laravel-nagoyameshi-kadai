@@ -69,13 +69,6 @@ class CategoryController extends Controller
         // バリデーションの実行
         $request->validate([
             'name' => 'required|max:255',
-            'postal_code' => 'required|numeric',
-            'address' => 'required',
-            'representative' => 'required',
-            'establishment_date' => 'required|date',
-            'capital' => 'required|numeric',
-            'business' => 'required',
-            'number_of_employees' => 'required|numeric',
         ]);
 
         // カテゴリの更新
@@ -86,7 +79,7 @@ class CategoryController extends Controller
         // フラッシュメッセージとリダイレクト
         return redirect()
             ->route('admin.categories.index')
-            ->with('flash_message', 'カテゴリを編集しました。');
+            ->with('flash_message', 'カテゴリを更新しました。');
     }
 
     /**
